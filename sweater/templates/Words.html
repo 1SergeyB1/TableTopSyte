@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Список слов</title>
+{% endblock %}
+
+{% block body %}
+
+    {% for i in data %}
+        <li><a href = "/EditWord/{{ i.id }}">{{i.word}}</a> <a href = "/DeleteWord/{{ i.id }}"><button>Удалить</button> <br></a></li>
+    {%endfor%}
+
+<a href="/CreateWord"><button>+</button></a>
+{% endblock %}
