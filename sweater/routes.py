@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, flash, url_for
+from flask import render_template, request, redirect, flash, url_for, g
 from flask_login import login_user, login_required, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -7,10 +7,21 @@ from models import User
 
 
 @app.route('/')
-@login_required
 def index():
-    return 'aboba'
+    return render_template('index.html')
 
+
+@app.route('/Users')
+def user_table():
+    data = User.query.order_by(User.id).all()
+    return render_template('Users.html', data=data)
+
+
+@app.route('/get_admin/<int:user_id>')
+def get_admin(user_id):
+    user = db.session.get(User, user_id)
+    user.role = 'Admin'
+    return redirect('user_table')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
@@ -19,6 +30,8 @@ def login_page():
     if login and password:
         user = User.query.filter_by(login=login).first()
         if user and check_password_hash(user.password, password):
+            if user.role != 'Admin':
+                return 'Ожидайте подтверждения учётной записи'
             login_user(user)
 
             next_page = request.args.get('next')
@@ -35,12 +48,18 @@ def login_page():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    db.create_all()
     if request.method == 'POST':
         login = request.form.get('login')
         password = request.form.get('password')
         password2 = request.form.get('password2')
-        if not (login and password and password2):
+
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        dads_name = request.form.get('dads_name')
+        messenger = request.form.get('messenger')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
+        if not (login and password and password2 and first_name and last_name and dads_name and messenger and phone and email):
             flash('Please, fill all fields!')
             return redirect(url_for('register'))
         elif password != password2:
@@ -51,6 +70,14 @@ def register():
             new_user = User()
             new_user.login = login
             new_user.password = hash_pwd
+
+            new_user.first_name = first_name
+            new_user.last_name = last_name
+            new_user.dads_name = dads_name
+            new_user.messenger = messenger
+            new_user.phone = phone
+            new_user.email = email
+
             db.session.add(new_user)
             db.session.commit()
             return redirect(url_for('login_page'))

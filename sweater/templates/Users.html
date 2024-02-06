@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>Список слов</title>
+{% endblock %}
+
+{% block body %}
+     <tr><th>Логин</th><th>Имя</th><th>Фамилия</th><th>Отчество</th><th>Соц. сеть</th><th>Номер телефона</th><th>Email</th><th>Роль(User, Admin)</th></tr>
+    {% for i in data %} 
+        <tr><th>{{i.login}}</th><th>{{i.first_name}}</th><th>{{i.last_name}}</th><th>{{i.dads_name}}</th><th>{{i.phone}}</th><th>{{i.email}}</th><th>{{i.role}}</th><th><a href = "/EditWord/{{ i.id }}"><button>Редактировать</button></a></th><th> <a href = "/DeleteWord/{{ i.id }}"><button>Удалить</button> </a></th></tr>
+    {%endfor%}
+
+<a href="/CreateWord"><button>+</button></a>
+{% endblock %}

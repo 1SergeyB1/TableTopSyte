@@ -7,8 +7,10 @@
 {% block body %}
 
 <div class="list">
-    <a href = "/Words"><h1>Список слов</h1></a><br>
-    <a href = "/Groups"><h1>Список групп</h1></a><br>
-    <a href = "/Parcing"><h1>Запустить парсер</h1></a><br>
+    <table>
+        <tr><th>Список пользователей</th><th><a href="/Users"><button>Перейти</button> </a></th></tr>
+        <tr><th>Список Игр</th><th><a href="/Games"><button>Перейти</button> </a></th></tr>
+        <tr><th>Список Достижений</th><th><a href="/Achievements"><button>Перейти</button> </a></th></tr>
+    </table>
 </div>
 {% endblock %}
