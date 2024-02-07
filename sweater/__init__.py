@@ -3,11 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
 
-"""
-Admin
-dECWzMz~N9EAlsD
-dECWzMz~N9EAlsD
-"""
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///Data.db'
 app.config['SECRET_KEY'] = '%ZK5uE8y}%AtBwN'

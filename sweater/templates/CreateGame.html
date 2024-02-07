@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить игру</title>
+</head>
+<body>
+<h1>Добавить игру</h1>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+
+<form method="POST">
+  <table>
+    <tr>
+      <td>Название игры</td>
+      <td><input type="text" name="name" placeholder="Название"></td>
+    </tr>
+        <tr>
+      <td>Количество уровней</td>
+      <td><input type="text" name="levels" placeholder="Кол-во уровней"></td>
+    </tr>
+    <tr>
+      <td><a href="{{ url_for('games_table') }}">Вернуться к списку игр</a> </td>
+      <td><input type="submit" value="Добавить игру"></td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register</title>
+</head>
+<body>
+<h1>Login page</h1>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+
+<form method="POST">
+  <table>
+    <tr>
+      <td>Игра</td>
+      <td><input type="text" name="name" value="{{game.name}}"></td>
+    </tr>
+        <tr>
+      <td>Кол-во уровней</td>
+      <td><input type="text" name="levels" value="{{game.levels}}"></td>
+    </tr>
+    <tr>
+      <td><a href="{{ url_for('user_table') }}">Вернуться к списку игр</a> </td>
+      <td><input type="submit" value="Редактировать игру"></td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>

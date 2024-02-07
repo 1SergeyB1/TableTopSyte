@@ -1,27 +1,19 @@
-from flask import render_template, request, redirect, flash, url_for, g
+from flask import render_template, request, redirect, flash, url_for
 from flask_login import login_user, login_required, logout_user
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from sweater import app, db
-from models import User
+from models import User, Games
 
 
 @app.route('/')
 def index():
+    db.create_all()
     return render_template('index.html')
 
 
-@app.route('/Users')
-def user_table():
-    data = User.query.order_by(User.id).all()
-    return render_template('Users.html', data=data)
 
 
-@app.route('/get_admin/<int:user_id>')
-def get_admin(user_id):
-    user = db.session.get(User, user_id)
-    user.role = 'Admin'
-    return redirect('user_table')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_page():
@@ -30,8 +22,6 @@ def login_page():
     if login and password:
         user = User.query.filter_by(login=login).first()
         if user and check_password_hash(user.password, password):
-            if user.role != 'Admin':
-                return 'Ожидайте подтверждения учётной записи'
             login_user(user)
 
             next_page = request.args.get('next')
@@ -80,9 +70,110 @@ def register():
 
             db.session.add(new_user)
             db.session.commit()
-            return redirect(url_for('login_page'))
+            return redirect(url_for('user_table'))
     return render_template('register.html')
 
+
+@app.route('/Users')
+def user_table():
+    data = User.query.order_by(User.id).all()
+    return render_template('Users.html', data=data)
+
+
+@app.route('/EditUser/<int:user_id>', methods=['GET', 'POST'])
+def edit_user(user_id):
+    new_user = db.session.get(User, user_id)
+    if request.method == 'POST':
+        login = request.form.get('login')
+        password = request.form.get('password')
+        password2 = request.form.get('password2')
+
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        dads_name = request.form.get('dads_name')
+        messenger = request.form.get('messenger')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
+        if not (login and first_name and last_name and dads_name and messenger and phone and email):
+            flash('Please, fill all fields!')
+            return render_template('EditUser.html', user=new_user)
+        elif password != password2:
+            flash('Passwords are not equal!')
+            return render_template('EditUser.html', user=new_user)
+        else:
+            hash_pwd = generate_password_hash(password)
+            new_user.login = login
+            if password:
+                new_user.password = hash_pwd
+            new_user.first_name = first_name
+            new_user.last_name = last_name
+            new_user.dads_name = dads_name
+            new_user.messenger = messenger
+            new_user.phone = phone
+            new_user.email = email
+
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('user_table'))
+    return render_template('EditUser.html', user=new_user)
+
+
+@app.route('/DeleteUser/<int:user_id>', methods=['GET', 'POST'])
+def delete_user(user_id):
+    delete = db.session.get(User, user_id)
+    db.session.delete(delete)
+    db.session.commit()
+    return redirect(url_for('user_table'))
+
+
+@app.route('/Games')
+def games_table():
+    data = Games.query.order_by(Games.id).all()
+    return render_template('Games.html', data=data)
+
+
+@app.route('/CreateGame', methods=['GET', 'POST'])
+def create_game():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        levels = request.form.get('levels')
+        if not(name and levels):
+            flash('Please, fill all fields!')
+            return redirect(url_for('create_game'))
+        else:
+            new_game = Games()
+            new_game.name = name
+            new_game.levels = levels
+            db.session.add(new_game)
+            db.session.commit()
+            return redirect(url_for('games_table'))
+    return render_template('CreateGame.html')
+
+
+@app.route('/EditGame/<int:user_id>', methods=['GET', 'POST'])
+def edit_game(user_id):
+    new_game = db.session.get(Games, user_id)
+    if request.method == 'POST':
+        name = request.form.get('name')
+        levels = request.form.get('levels')
+        if not (name and levels):
+            flash('Please, fill all fields!')
+            return render_template('EditGame.html', user=new_game)
+        else:
+            new_game.name = name
+            new_game.levels = levels
+            db.session.add(new_game)
+            db.session.commit()
+            return redirect(url_for('games_table'))
+    return render_template('EditGame.html', game=new_game)
+
+
+@app.route('/DeleteGame/<int:user_id>', methods=['GET', 'POST'])
+def delete_game(user_id):
+    delete = db.session.get(Games, user_id)
+    db.session.delete(delete)
+    db.session.commit()
+    return redirect(url_for('games_table'))
 
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
